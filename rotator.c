@@ -13,10 +13,15 @@
 #include <errno.h>
 #endif
 
+#include <sys/select.h>
+#include <sys/time.h>
+
 #define BUFSZ 4096
 #define MAXFRAGS 10
 #define FRAGSZ 5 * 1024 * 1024
 
+// write_with_limit writes up to limit bytes consumed from STDIN into the file
+// pointed to by filename.
 int write_with_limit(char *filename, size_t limit) {
     int fd;
     int retcode = 0;
@@ -27,7 +32,6 @@ int write_with_limit(char *filename, size_t limit) {
     bool opened = false;
 
     assert(limit > total_written); // This is a requirement.
-
     while (total_written < limit) {
         ssize_t nwritten = 0;
         ssize_t nread = 0;
@@ -126,6 +130,19 @@ int main(int argc, char *argv[]) {
     if (fragment_size < BUFSZ) {
         fprintf(stderr, "file fragment size '%zu' cannot be less than internal buffer; increasing size to '%d'\n", fragment_size, BUFSZ);
         fragment_size = BUFSZ;
+    }
+
+    // If the STDIN file descriptor is not ready, the program was probably
+    // executed without redirecting output from another program.
+    fd_set readset;
+    FD_ZERO(&readset);
+    FD_SET(STDIN_FILENO, &readset);
+    struct timeval timeout = {.tv_sec = 0, .tv_usec = 500000};
+    if (select(1, &readset, NULL, NULL, &timeout) < 1) {
+        fprintf(stderr,
+            "did you forget to pipe in another program's stdout?\n");
+        retcode = 1;
+        goto done;
     }
 
     while (1) {
