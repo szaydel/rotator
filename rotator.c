@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <sys/errno.h>
 #include <sys/stat.h>
-#ifdef __illumos__
+#if defined(__sun) || defined(__illumos__)
 #include <errno.h>
 #endif
 
