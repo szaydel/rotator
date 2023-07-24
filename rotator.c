@@ -1,4 +1,5 @@
-
+#include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -6,15 +7,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <assert.h>
-#include <sys/errno.h>
-#include <sys/stat.h>
-#if defined(__sun) || defined(__illumos__)
-#include <errno.h>
-#endif
 
 #include <sys/select.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+
+#if defined(__sun) || defined(__illumos__)
+// Include illumos/Sun-specific bits here
+#endif
 
 #define BUFSZ 4096
 #define MAXFRAGS 10
