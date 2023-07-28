@@ -129,7 +129,7 @@ main(int argc, char* argv[])
   } else {
     filename = DEFAULT_OUTPUT_FILENAME;
     fprintf(stderr,
-            "destination file name not specified; defaulting to'%s.idx'\n",
+            "destination file name not specified; defaulting to: '%s.idx'\n",
             filename);
   }
 
